@@ -106,6 +106,9 @@ const skyportal = {
 		return products;
   },
   writeFile: async (products) => {
+
+    console.log('...writing csv file');
+
     const csvWriter = createCsvObjectWriter({
       path: `../csv/allProducts.csv`,
       header: [
