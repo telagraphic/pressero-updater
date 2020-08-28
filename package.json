@@ -1,0 +1,19 @@
+{
+  "name": "pressero-product-updater",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "global-x": "node globalx.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "puppeteer": "^5.2.1",
+    "xlsx": "^0.16.6"
+  },
+  "devDependencies": {}
+}
