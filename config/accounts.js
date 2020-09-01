@@ -1,13 +1,3 @@
-const pageflex = {
-  username: 'Clayton',
-  password: 'nickpass'
-};
-
-const printSmith = {
-  username: 'barcode',
-  password: 'lic3030'
-};
-
 const skyportal = {
   username: 'nlyons',
   password: 'gsbskyportal'
