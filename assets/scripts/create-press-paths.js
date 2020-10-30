@@ -2,10 +2,12 @@ const path = require('path');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const createCsvArrayWriter = require('csv-writer').createArrayCsvWriter;
+const pressFilePath = '../pdfs';
+const pressPathFile = '../files/press-paths.csv';
 
 const assets = {
   updatePressPath: async () => {
-    let dir = path.join(__dirname, '../press-files');
+    let dir = path.join(__dirname, pressFilePath);
     const files = fs.readdirSync(dir);
 
     let newPaths = [];
@@ -20,14 +22,14 @@ const assets = {
   },
   writePressPathFile: async (paths) => {
     let csvWriter = createCsvArrayWriter({
-      path: `../files/press-paths.csv`
+      path: pressPathFile
     });
 
     let arrayPaths = paths.map(path => [path])
 
     csvWriter
       .writeRecords(arrayPaths)
-      .then(() => console.log("assets written to CSV at pressero-product-updater/products/files/press-paths.csv"));
+      .then(() => console.log(`asset paths written to CSV at pressero-product-updater/assets/files/press-paths.csv`));
   }
 }
 

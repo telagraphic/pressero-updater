@@ -18,10 +18,9 @@ const skyportal = {
     }
   },
   pageURL: sites.LOGIN.loginPage,
-  assetsURL: sites.BODDINGTON.assetsPage,
+  assetsURL: 'https://admin.chi.v6.pressero.com/site/quartet.gsbskyportal.com/Assets?ignoreSavedState=True',
   excelJSON: null,
-  shortDescription: 'Updated 8/27/2020',
-
+  workbookPath: './quartet-assets.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -97,12 +96,12 @@ const skyportal = {
       const pageToScrape = `.k-pager-numbers a[data-page="${pageNumber}"]`;
       await skyportal.page.click(pageToScrape);
       await skyportal.page.waitFor(3000);
-      allAssets = await skyportal.scrapeAssets();
+      allAssets = await skyportal.scrapeAssetsOnPage();
     }
 
     return allAssets;
   },
-  scrapeAssets: async () => {
+  scrapeAssetsOnPage: async () => {
 		console.log("...getting assets");
     skyportal.page.waitFor(3000);
 		const assets = await skyportal.page.evaluate(() => {
@@ -152,7 +151,7 @@ const skyportal = {
     const worksheetData = XLSX.utils.json_to_sheet(assets);
 
     XLSX.utils.book_append_sheet(workbook, worksheetData, worksheet);
-    XLSX.writeFile(workbook, './assets.xlsx');
+    XLSX.writeFile(workbook, skyportal.workbookPath);
 
     // https://github.com/SheetJS/sheetjs/issues/1473
     // autofit the columns before writing?
@@ -172,7 +171,7 @@ const skyportal = {
 async function createAssetURLS() {
 	await skyportal.signIn();
 	await skyportal.goToAssetsPage();
-	let assets = await skyportal.scrapePageNumber(3);
+	let assets = await skyportal.scrapePageNumber(1);
   await skyportal.writeFile(assets);
 	await skyportal.signOut();
 }
