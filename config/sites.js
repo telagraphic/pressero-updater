@@ -1,4 +1,3 @@
-
 const presseroLogin = {
   loginPage: 'https://admin.chi.v6.pressero.com/authentication/Login'
 }

@@ -17,7 +17,7 @@ Copy the contents from the **thumbnailPaths.csv** generated in **products/files*
 Copy the contents from the **press-paths.csv** generated in **assets/files** into the excel file under the column labeled "AssetPaths"
 
 
-## Double Check
+## Double Checkh
 Check that each asset and thumbnail path is on the correct product row!
 
 ## Run the updater

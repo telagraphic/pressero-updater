@@ -2,8 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const createCsvArrayWriter = require('csv-writer').createArrayCsvWriter;
-const pressFilePath = '../pdfs';
-const pressPathFile = '../files/press-paths.csv';
+const pressFilePath = '../../new-updates/press-files';
+const pressPathFile = 'assets/files/press-paths.csv';
 
 const assets = {
   updatePressPath: async () => {

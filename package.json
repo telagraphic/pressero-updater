@@ -4,7 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "products:paths": "node products/scripts/create-thumbnail-paths.js",
+    "products:get": "node products/scripts/get-products.js",
+    "products:update": "node products/scripts/update-products.js",
+    "products:delete": "node products/scripts/delete-products.js",
+    "assets:paths": "node assets/scripts/create-press-paths.js",
+    "assets:get": "node assets/scripts/get-assets.js",
+    "assets:update": "node assets/scripts/update-assets.js",
+    "assets:delete": "node assets/asset-updater/delete-assets.js",
+    "create-paths": "run-p products:paths assets:paths"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +20,7 @@
   "dependencies": {
     "csv-writer": "^1.6.0",
     "csvjson": "^5.1.0",
+    "npm-run-all": "^4.1.5",
     "puppeteer": "^5.2.1",
     "xlsx": "^0.16.6"
   },

@@ -15,7 +15,7 @@ const skyportal = {
   pageURL: sites.LOGIN.loginPage,
   assetsURL: 'https://admin.chi.v6.pressero.com/site/quartet.gsbskyportal.com/Assets?ignoreSavedState=True',
   excelJSON: null,
-  workbookPath: 'quartet-assets.xlsx',
+  workbookPath: 'assets/files/assets.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();

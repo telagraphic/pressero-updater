@@ -2,10 +2,12 @@ const path = require('path');
 const fs = require('fs');
 const createCsvArrayWriter = require('csv-writer').createArrayCsvWriter;
 const XLSX = require('xlsx');
+const thumbnailFilePath = '../../new-updates/thumbnails';
+const thumbPathFile = 'products/files/thumbnail-paths.csv';
 
 const products = {
   updateThumbPaths: async () => {
-    let dir = path.join(__dirname, '../thumbnails');
+    let dir = path.join(__dirname, thumbnailFilePath);
     const files = fs.readdirSync(dir);
 
     let newPaths = [];
@@ -20,10 +22,10 @@ const products = {
   },
   writeThumbnailPathFile: async (paths) => {
     let csvWriter = createCsvArrayWriter({
-      path: `../files/thumbnail-paths.csv`
+      path: thumbPathFile
     });
 
-    let arrayPaths = paths.map(path => [path])
+    let arrayPaths = paths.map(path => [path]);
 
     csvWriter
       .writeRecords(arrayPaths)

@@ -15,7 +15,8 @@ const skyportal = {
   },
   pageURL: sites.LOGIN.loginPage,
   excelJSON: null,
-  shortDescription: 'Updated 8/27/2020',
+  shortDescription: 'Updated 11/5/2020',
+  workbookPath: 'products/files/Updates11-4.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -39,7 +40,7 @@ const skyportal = {
 		await skyportal.page.waitFor(2000);
   },
   setupSpreadsheet: async () => {
-    let workbook = XLSX.readFile('./product-update.xlsx');
+    let workbook = XLSX.readFile(skyportal.workbookPath);
     var sheetName = workbook.SheetNames;
     skyportal.excelJSON = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName[0]]);
   },
@@ -50,7 +51,7 @@ const skyportal = {
     }
   },
   updateProduct: async (product) => {
-    skyportal.page.goto(product.ProductEditURL);
+    skyportal.page.goto(product.ProductURL);
     await skyportal.page.waitFor(2000);
 
     await skyportal.updateDescription();

@@ -16,9 +16,8 @@ const skyportal = {
   pageURL: sites.LOGIN.loginPage,
   assetsURL: sites.GLOBALX.assetsPage,
   excelJSON: null,
-  shortDescription: 'Updated 8/27/2020',
-  workbookPath: 'factsheets-assets.xlsx',
-
+  shortDescription: 'Updated 11/5/2020',
+  workbookPath: 'new-updates/Updates11-4.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -47,6 +46,8 @@ const skyportal = {
     skyportal.excelJSON = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName[0]]);
 
     console.log(`spreadsheet setup`);
+
+    console.log(skyportal.excelJSON);
   },
   updateAssets: async () => {
     for (let i = 0; i < skyportal.excelJSON.length; i++) {
@@ -74,11 +75,11 @@ const skyportal = {
     await skyportal.page.waitForSelector(uploadFile);
     const inputUploadHandle = await skyportal.page.$(uploadFile);
 
-    inputUploadHandle.uploadFile(product.PressPath)
+    inputUploadHandle.uploadFile(product.AssetPath)
 
     let saveButton = '.page-action-footer input[type="submit"]';
     await skyportal.page.click(saveButton);
-    await skyportal.page.waitForNavigation({ waitUntil: 'networkidle0' })
+    await skyportal.page.waitForNavigation({ waitUntil: 'networkidle2' })
   },
   signOut: async () => {
     const signout = '.navbar-right a[href="/authentication/logout"]';

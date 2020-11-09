@@ -1,8 +1,9 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
-const accounts = require('../../config/accounts.js');
 const sites = require('../../config/sites.js');
+const accounts = require('../../config/accounts.js');
+const createCsvArrayWriter = require('csv-writer').createArrayCsvWriter;
 const XLSX = require('xlsx');
 
 const skyportal = {
@@ -13,10 +14,9 @@ const skyportal = {
     defaultViewport : null
   },
   pageURL: sites.LOGIN.loginPage,
-  assetsURL: sites.GLOBALX.assetsPage,
   excelJSON: null,
   shortDescription: 'Updated 8/27/2020',
-
+  workbookPath: 'products/files/products.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -40,43 +40,32 @@ const skyportal = {
 		await skyportal.page.waitFor(2000);
   },
   setupSpreadsheet: async () => {
-    let workbook = XLSX.readFile('factsheets-assets.xlsx');
+    let workbook = XLSX.readFile(skyportal.workbookPath);
     var sheetName = workbook.SheetNames;
     skyportal.excelJSON = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName[0]]);
-
-    console.log(`spreadsheet setup`);
   },
-  updateAssets: async () => {
+  deleteProducts: async () => {
     for (let i = 0; i < skyportal.excelJSON.length; i++) {
-      console.log(`Processing ${skyportal.excelJSON[i].Product}...`);
-      await skyportal.updateAsset(skyportal.excelJSON[i]);
+      console.log("Product: ", skyportal.excelJSON[i].Product);
+      await skyportal.deleteProduct(skyportal.excelJSON[i]);
     }
   },
-  updateAsset: async (product) => {
-    skyportal.page.goto(product.AssetURL);
-    await skyportal.page.waitFor(2000);
+  deleteProduct: async (product) => {
+    skyportal.page.goto(product.ProductEditURL);
+    await skyportal.page.waitFor(3000);
+    await skyportal.page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+    const deleteButton = '.page-action-footer .btn-danger';
+    const cancelButton = '.btn-default';
 
-    // update description date
-    let descriptionTextarea = 'textarea#Description';
-    let existingDescription = await skyportal.page.$eval(descriptionTextarea, el => el.value);
-
-    await skyportal.page.click(descriptionTextarea);
-    for (let i = 0; i < existingDescription.length; i++) {
-      await skyportal.page.keyboard.press('Backspace');
+    try {
+      await skyportal.page.waitForSelector(deleteButton, { timeout: 2000 });
+      await skyportal.page.click(deleteButton);
+      await skyportal.page.waitFor(3000);
+    } catch {
+      await skyportal.page.click(cancelButton);
     }
-
-    await skyportal.page.type(descriptionTextarea, skyportal.shortDescription);
-
-    //upload file
-    let uploadFile = 'input#assetFile';
-    await skyportal.page.waitForSelector(uploadFile);
-    const inputUploadHandle = await skyportal.page.$(uploadFile);
-
-    inputUploadHandle.uploadFile(product.PressPath)
-
-    let saveButton = '.page-action-footer input[type="submit"]';
-    await skyportal.page.click(saveButton);
-    await skyportal.page.waitForNavigation({ waitUntil: 'networkidle0' })
   },
   signOut: async () => {
     const signout = '.navbar-right a[href="/authentication/logout"]';
@@ -88,11 +77,11 @@ const skyportal = {
   }
 }
 
-async function updateAssets() {
-  await skyportal.signIn();
-  await skyportal.setupSpreadsheet();
-  await skyportal.updateAssets();
-  await skyportal.signOut();
+async function deleteProducts() {
+	await skyportal.signIn();
+	await skyportal.setupSpreadsheet();
+  await skyportal.deleteProducts();
+	await skyportal.signOut();
 }
 
-updateAssets();
+deleteProducts();

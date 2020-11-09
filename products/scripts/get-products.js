@@ -18,9 +18,9 @@ const skyportal = {
     }
   },
   pageURL: sites.LOGIN.loginPage,
-  productsURL: sites.BODDINGTON.productsPage,
+  productsURL: 'https://admin.chi.v6.pressero.com/site/groupm.gsbskyportal.com/Products?ignoreSavedState=True',
   excelJSON: null,
-  shortDescription: 'Updated 8/27/2020',
+  workbookPath: 'products/files/products.xlsx',
   signIn: async () => {
     skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -66,8 +66,6 @@ const skyportal = {
       return pageNumbers.length;
     });
 
-    console.log(pageCount);
-
     let allProducts = [];
 
     for (let index = 0; index < pageCount; index++) {
@@ -81,7 +79,6 @@ const skyportal = {
     }
 
     return allProducts;
-
   },
   scrapeProducts: async () => {
 		console.log("...getting products");
@@ -106,32 +103,40 @@ const skyportal = {
 
 		return products;
   },
-  writeCSV: async (products) => {
-    console.log('...writing csv file');
-
-    const csvWriter = createCsvObjectWriter({
-      path: `./products.csv`,
-      header: [
-        {id: 'Product', title: 'Product'},
-        {id: 'URL', title: 'URL'},
-        {id: 'URLString', title: 'ProductURL'},
-        {id: 'PartNumber', title: 'PartNumber'}
-      ]
-    });
-
-    csvWriter
-      .writeRecords(products)
-      .then(()=> console.log("assets written to CSV at pressero-product-updater/products/get-products/products.csv"));
-  },
   writeExcel: async (products) => {
-    console.log('...writing excel file');
+    console.log("...saving excel");
+
+    let formattedColumnsWidth = skyportal.formatColumns(products);
 
     const workbook = XLSX.utils.book_new();
     const worksheet = 'Products';
     const worksheetData = XLSX.utils.json_to_sheet(products);
+    worksheetData["!cols"] = formattedColumnsWidth;
 
     XLSX.utils.book_append_sheet(workbook, worksheetData, worksheet);
-    XLSX.writeFile(workbook, './products.xlsx');
+    XLSX.writeFile(workbook, skyportal.workbookPath);
+  },
+  formatColumns: (columns) => {
+    let objectMaxLength = [];
+    for (let i = 0; i < columns.length; i++) {
+      let value = Object.values(columns[i]);
+      for (let j = 0; j < value.length; j++) {
+        if (typeof value[j] == "number") {
+          objectMaxLength[j] = 10;
+        } else {
+          objectMaxLength[j] = objectMaxLength[j] >= value[j].length ? objectMaxLength[j] : value[j].length;
+        }
+      }
+    };
+
+    var wscols = [
+      { width: objectMaxLength[0] },
+      { width: objectMaxLength[1] },
+      { width: objectMaxLength[2] },
+      { width: objectMaxLength[3] }
+    ];
+
+    return wscols;
   },
   signOut: async () => {
     const signout = '.navbar-right a[href="/authentication/logout"]';
@@ -142,7 +147,6 @@ const skyportal = {
     process.exit(0);
   }
 }
-
 
 async function createProductURLS() {
 	await skyportal.signIn();

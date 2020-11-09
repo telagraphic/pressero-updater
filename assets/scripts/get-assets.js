@@ -18,9 +18,9 @@ const skyportal = {
     }
   },
   pageURL: sites.LOGIN.loginPage,
-  assetsURL: 'https://admin.chi.v6.pressero.com/site/quartet.gsbskyportal.com/Assets?ignoreSavedState=True',
+  assetsURL: 'https://admin.chi.v6.pressero.com/site/mfg.gsbskyportal.com/Assets?ignoreSavedState=True',
   excelJSON: null,
-  workbookPath: './quartet-assets.xlsx',
+  workbookPath: 'assets/files/assets.xlsx',
   signIn: async () => {
 		skyportal.browser = await puppeteer.launch(skyportal.options);
 		skyportal.page = await skyportal.browser.newPage();
@@ -91,7 +91,7 @@ const skyportal = {
 
     if (pageNumber === 1) {
       await skyportal.page.waitFor(3000);
-      allAssets = await skyportal.scrapeAssets();
+      allAssets = await skyportal.scrapeAssetsOnPage();
     } else {
       const pageToScrape = `.k-pager-numbers a[data-page="${pageNumber}"]`;
       await skyportal.page.click(pageToScrape);
@@ -112,8 +112,8 @@ const skyportal = {
 
 			assetsList.forEach(presseroAsset => {
         let asset = {};
-        asset.Product = presseroAsset.querySelector('td:nth-child(4)').textContent;
-				asset.URL = presseroAsset.querySelector('td:nth-child(1) a').href;
+        asset.Asset = presseroAsset.querySelector('td:nth-child(4)').textContent;
+				asset.AssetEditURL = presseroAsset.querySelector('td:nth-child(1) a').href;
 				allAssets.push(asset)
 			})
 
@@ -121,15 +121,15 @@ const skyportal = {
 		});
 
     for (let index=0; index < assets.length; index++) {
-      assets[index].productLink = await skyportal.scrapeAsset(assets[index]);
+      assets[index].ProductLink = await skyportal.scrapeAsset(assets[index]);
     }
 
 		return assets;
 	},
   scrapeAsset: async (asset) => {
-    console.log(`scraping ${asset.Product}`);
+    console.log(`scraping ${asset.Asset}`);
 
-    await skyportal.page.goto(asset.URL);
+    await skyportal.page.goto(asset.AssetEditURL);
     await skyportal.page.waitFor(5000);
 
     const assetProduct = await skyportal.page.evaluate(() => {
@@ -146,16 +146,37 @@ const skyportal = {
   writeFile: async (assets) => {
     console.log('...writing excel file');
 
+    let formattedColumnsWidth = skyportal.formatColumns(assets);
+
     const workbook = XLSX.utils.book_new();
     const worksheet = 'Assets';
     const worksheetData = XLSX.utils.json_to_sheet(assets);
+    worksheetData["!cols"] = formattedColumnsWidth;
 
     XLSX.utils.book_append_sheet(workbook, worksheetData, worksheet);
     XLSX.writeFile(workbook, skyportal.workbookPath);
 
-    // https://github.com/SheetJS/sheetjs/issues/1473
-    // autofit the columns before writing?
+  },
+  formatColumns: (columns) => {
+    let objectMaxLength = [];
+    for (let i = 0; i < columns.length; i++) {
+      let value = Object.values(columns[i]);
+      for (let j = 0; j < value.length; j++) {
+        if (typeof value[j] == "number") {
+          objectMaxLength[j] = 10;
+        } else {
+          objectMaxLength[j] = objectMaxLength[j] >= value[j].length ? objectMaxLength[j] : value[j].length;
+        }
+      }
+    };
 
+    var wscols = [
+      { width: objectMaxLength[0] },
+      { width: objectMaxLength[1] },
+      { width: objectMaxLength[2] }
+    ];
+
+    return wscols;
   },
   signOut: async () => {
     const signout = '.navbar-right a[href="/authentication/logout"]';

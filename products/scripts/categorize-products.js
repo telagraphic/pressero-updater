@@ -28,8 +28,6 @@ const products = {
   writeExcel: async (products) => {
 
     console.log('...writing excel file');
-    // const workbook = XLSX.utils.book_new();
-    // if book exist then open and add new worksheet, else create it!
     let workbook = XLSX.readFile("../excel/Products.xlsx");
     const worksheet = 'Presentation Materials';
     const worksheetData = XLSX.utils.json_to_sheet(products);
